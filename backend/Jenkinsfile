@@ -1,0 +1,74 @@
+pipeline {
+	agent any
+
+  options {
+    disableConcurrentBuilds() // Deshabilitar buils concurrentes
+    timestamps
+  	timeout(5)
+  }
+
+	environment {
+  	FORCE_COLOR = "0"
+  	NO_COLOR = "true"
+	}
+
+	stages {
+		stage('Audit tools') {
+			steps {
+				sh 'node --version'
+			}
+		}
+
+		stage('Install dependencies') {
+			steps {
+				sh 'npm install'
+			}
+		}
+
+				stage('Format check') {
+			steps {
+				sh 'npm run format:check'
+			}
+		}
+
+		stage('Code quality') {
+			steps {
+				sh 'npm run lint'
+			}
+		}
+
+		stage('Type check') {
+			steps {
+				sh 'npm run type-check'
+			}
+		}
+
+		stage('Tests') {
+			steps {
+				sh 'npm run test'
+		}
+
+		stage('Build') {
+			steps {
+				sh 'npm run build'
+				archiveArtifacts artifacts: 'dist/', fingerprint: true, followSymlinks: false
+		}
+
+	}
+
+
+	post {
+		always{
+			cleanWs()
+		}
+
+		success {
+			echo 'Pipeline complete successfully!'
+		}
+
+		failure{
+			sh 'echo "Pipeline failed. Review logs."'
+		}
+	}
+
+}
