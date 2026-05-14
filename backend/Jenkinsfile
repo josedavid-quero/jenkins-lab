@@ -3,7 +3,7 @@ pipeline {
 
   options {
     disableConcurrentBuilds() // Deshabilitar buils concurrentes
-    timestamps
+    timestamps()
   	timeout(5)
   }
 
